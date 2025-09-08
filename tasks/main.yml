@@ -1,0 +1,55 @@
+---
+- name: nano role
+  tags:
+    - nano
+  block:
+
+  - name: Install nano packages
+    become: true
+    ansible.builtin.apt:
+      name:
+      - nano
+      state: present
+
+  # nano.config.src
+  - name: Copy config files
+    when: 
+    - nano.config.src != None 
+    - nano.config.src != false
+    block:
+  
+    # normal user
+    - when:
+      - nano.user != "root"
+      - nano.user != "global"
+      - nano.user != "system"
+      name: Copy {{ nano.config.src }}/nanorc to /home/{{ nano.user }}/.nanorc
+      become: true
+      ansible.builtin.copy:
+        src: "{{ nano.config.src }}"
+        dest: "/home/{{ nano.user }}/.nanorc"
+        owner: "{{ nano.user }}"
+        group: "{{ nano.user }}"
+        mode: u=rw,g=,o=
+
+    # root
+    - when: nano.user == "root"
+      name: Copy {{ nano.config.src }}/nanorc to /root/.nanorc
+      become: true
+      ansible.builtin.copy:
+        src: "{{ nano.config.src }}"
+        dest: /root/.nanorc
+        owner: root
+        group: root
+        mode: u=rw,g=,o=
+
+    # global || system
+    - when: (nano.user == "global") or (nano.user == "system")
+      name: Copy {{ nano.config.src }}/nanorc to /etc/nanorc
+      become: true
+      ansible.builtin.copy:
+        src: "{{ nano.config.src }}"
+        dest: /etc/nanorc
+        owner: root
+        group: root
+        mode: u=rw,g=,o=r
