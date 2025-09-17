@@ -1,5 +1,5 @@
 ---
 nano:
-  user:
+  user: # <user>, root, global
   config:
     src:

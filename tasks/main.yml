@@ -4,18 +4,16 @@
     - nano
   block:
 
+  # apt install
   - name: Install nano packages
     become: true
     ansible.builtin.apt:
-      name:
-      - nano
+      name: nano
       state: present
 
   # nano.config.src
   - name: Copy config files
-    when: 
-    - nano.config.src != None 
-    - nano.config.src != false
+    when: nano.config.src != None 
     block:
   
     # normal user
